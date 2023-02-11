@@ -1,1 +1,3 @@
 # RHTTP-node
+
+RHTTP NodeJS SDK
