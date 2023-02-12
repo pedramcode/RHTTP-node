@@ -253,7 +253,7 @@ export interface EndpointType {
   handler: RequestHandlerType,
 }
 
-export default class RHTTP {
+export class RHTTPServer {
   redis_host: string;
   redis_port: number;
   endpoints: Array<EndpointType>;
