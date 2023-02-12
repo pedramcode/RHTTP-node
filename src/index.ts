@@ -335,7 +335,7 @@ export class RHTTPServer {
           res = endpoint.handler(req, response(req));
         }
       });
-      if(res.length <= 0) return;
+      if(!res || res.length <= 0) return;
       client.publish('RESPONSE_PIPE', res);
     };
     await sub_client.subscribe(['REQUEST_PIPE'], listener);
