@@ -1,6 +1,6 @@
 {
   "name": "rhttp_node",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "RHTTP NodeJS SDK",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,7 +28,7 @@
     "http"
   ],
   "author": "Pedram Dehghanpour",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/pedramcode/RHTTP-node/issues"
   },
