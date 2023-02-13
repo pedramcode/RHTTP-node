@@ -1,7 +1,7 @@
 {
   "name": "rhttp_node",
-  "version": "0.0.6",
-  "description": "RHTTP NodeJS SDK",
+  "version": "0.0.7",
+  "description": "RHTTP NodeJS interface",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
