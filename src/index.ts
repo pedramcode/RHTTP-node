@@ -1,4 +1,5 @@
 import { RedisClusterType, createClient } from 'redis';
+import { randomBytes } from "crypto";
 
 export type HttpMethod =
   | 'GET'
@@ -256,12 +257,16 @@ export interface EndpointType {
 export class RHTTPServer {
   redis_host: string;
   redis_port: number;
+  server_name?: string;
+  server_desc?: string;
   endpoints: Array<EndpointType>;
 
-  constructor(host: string, port: number) {
+  constructor(host: string, port: number, server_name?: string, server_desc?: string) {
     this.redis_host = host;
     this.redis_port = port;
     this.endpoints = new Array<EndpointType>();
+    this.server_name = server_name?server_name:randomBytes(20).toString('hex');
+    this.server_desc = server_desc?server_desc:"SERVICE";
   }
 
   private add_endpoint(method: HttpMethod, path: string, handler: RequestHandlerType): void {
@@ -308,7 +313,7 @@ export class RHTTPServer {
     this.add_endpoint('PATCH', path, handler);
   }
 
-  async listen(callback: (err: string | undefined) => void | undefined) {
+  async listen(callback?: (err: string | undefined) => void | undefined) {
     const client = await createClient({
       url: `redis://${this.redis_host}:${this.redis_port}`,
     });
@@ -321,23 +326,29 @@ export class RHTTPServer {
     sub_client.on('error', err => {
       if (callback) callback(err);
     });
-    callback('Server is listening to request pipe');
+    if (callback) callback('Server is listening to request pipe');
 
     const listener = (message: string, channel: string) => {
-      if (channel !== 'REQUEST_PIPE') return;
-      let req_raw = httpParseMessage(message);
-      if (req_raw.type !== 'request') return;
-      let req: RequestType = req_raw as RequestType;
+      if (channel === 'REQUEST_PIPE') {
+        let req_raw = httpParseMessage(message);
+        if (req_raw.type !== 'request') return;
+        let req: RequestType = req_raw as RequestType;
 
-      let res = '';
-      this.endpoints.forEach(endpoint => {
-        if (endpoint.path == req.path && endpoint.method == req.method) {
-          res = endpoint.handler(req, response(req));
+        let res = '';
+        this.endpoints.forEach(endpoint => {
+          if (endpoint.path == req.path && endpoint.method == req.method) {
+            res = endpoint.handler(req, response(req));
+          }
+        });
+        if (!res || res.length <= 0){
+          client.publish("REJECT_PIPE", req.headers["X-Socket-ID"]);
+          return;
         }
-      });
-      if(!res || res.length <= 0) return;
-      client.publish('RESPONSE_PIPE', res);
+        client.publish('RESPONSE_PIPE', res);
+      } else if (channel === 'HEARTBEAT') {
+        client.publish('ACKNOWLEDGE_PIPE', this.server_name + String.fromCharCode(14) + this.server_desc);
+      }
     };
-    await sub_client.subscribe(['REQUEST_PIPE'], listener);
+    await sub_client.subscribe(['REQUEST_PIPE', 'HEARTBEAT'], listener);
   }
 }
