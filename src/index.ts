@@ -352,7 +352,7 @@ export class RHTTPServer {
         this.endpoints.forEach(endpoint => {
           if (endpoint.path == req.path && endpoint.method == req.method) {
             let res_pre = response(req);
-            res_pre.header({ 'X-RES-SERVER': self.name });
+            res_pre.header({ 'X-RES-SERVER': this.server_name?this.server_name:"UNKNOWN" });
             res = endpoint.handler(req, res_pre);
           }
         });
@@ -368,3 +368,4 @@ export class RHTTPServer {
     await sub_client.subscribe(['REQUEST_PIPE', 'HEARTBEAT'], listener);
   }
 }
+
