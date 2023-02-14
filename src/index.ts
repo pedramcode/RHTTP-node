@@ -266,7 +266,7 @@ export class RHTTPServer {
     this.redis_port = port;
     this.endpoints = new Array<EndpointType>();
     this.server_name = server_name?server_name:randomBytes(20).toString('hex');
-    this.server_desc = server_desc?server_desc:"SERVICE";
+    this.server_desc = server_desc?server_desc:"NODEJS";
   }
 
   private add_endpoint(method: HttpMethod, path: string, handler: RequestHandlerType): void {
