@@ -266,11 +266,20 @@ export class RHTTPServer {
   server_desc?: string;
   endpoints: Array<EndpointType>;
 
+  private randomName() {
+    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    let result = "";
+    for (let i = 0; i < 20; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+  }
+
   constructor(host: string, port: number, server_name?: string, server_desc?: string) {
     this.redis_host = host;
     this.redis_port = port;
     this.endpoints = new Array<EndpointType>();
-    this.server_name = server_name?server_name:randomBytes(20).toString('hex');
+    this.server_name = server_name?server_name:this.randomName();
     this.server_desc = server_desc?server_desc:"NODEJS";
   }
 
