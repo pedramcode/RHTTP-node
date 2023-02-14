@@ -1,5 +1,5 @@
 import { RedisClusterType, createClient } from 'redis';
-import { randomBytes } from "crypto";
+import { randomBytes } from 'crypto';
 
 export type HttpMethod =
   | 'GET'
@@ -234,8 +234,8 @@ export class Response {
     return this;
   }
 
-  header(headers: {[key:string]: string}): Response {
-    this.data.headers = {...this.data.headers, ...headers};
+  header(headers: { [key: string]: string }): Response {
+    this.data.headers = { ...this.data.headers, ...headers };
     return this;
   }
 
@@ -267,8 +267,8 @@ export class RHTTPServer {
   endpoints: Array<EndpointType>;
 
   private randomName() {
-    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-    let result = "";
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    let result = '';
     for (let i = 0; i < 20; i++) {
       result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
@@ -279,8 +279,8 @@ export class RHTTPServer {
     this.redis_host = host;
     this.redis_port = port;
     this.endpoints = new Array<EndpointType>();
-    this.server_name = server_name?server_name:this.randomName();
-    this.server_desc = server_desc?server_desc:"NODEJS";
+    this.server_name = server_name ? server_name : this.randomName();
+    this.server_desc = server_desc ? server_desc : 'NODEJS';
   }
 
   private add_endpoint(method: HttpMethod, path: string, handler: RequestHandlerType): void {
@@ -351,11 +351,13 @@ export class RHTTPServer {
         let res = '';
         this.endpoints.forEach(endpoint => {
           if (endpoint.path == req.path && endpoint.method == req.method) {
-            res = endpoint.handler(req, response(req));
+            let res_pre = response(req);
+            res_pre.header({ 'X-RES-SERVER': self.name });
+            res = endpoint.handler(req, res_pre);
           }
         });
-        if (!res || res.length <= 0){
-          client.publish("REJECT_PIPE", req.headers["X-Socket-ID"]);
+        if (!res || res.length <= 0) {
+          client.publish('REJECT_PIPE', req.headers['X-Socket-ID']);
           return;
         }
         client.publish('RESPONSE_PIPE', res);
