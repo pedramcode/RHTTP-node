@@ -1,6 +1,6 @@
 {
   "name": "rhttp_node",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "RHTTP NodeJS interface",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
