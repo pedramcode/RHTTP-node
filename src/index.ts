@@ -234,6 +234,11 @@ export class Response {
     return this;
   }
 
+  header(headers: {[key:string]: string}): Response {
+    this.data.headers = {...this.data.headers, ...headers};
+    return this;
+  }
+
   send(body: string): string {
     this.data.body = body;
     this.data.headers['Content-Length'] = body.length.toString();
