@@ -41,6 +41,7 @@ The `Callback` parameter is a function with two parameters:
   * `res.status(200).contentType('application/json').send(JSON.stringify(response_data))`
 
 > **Note**
+> 
 > You need to return `send()` method result to callback function to continue progress.
 
 At the end server needs to listen to Redis for receiving incoming requests:
